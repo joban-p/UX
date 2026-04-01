@@ -1,0 +1,3398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soldo — Pillar Page Component Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,400&family=Open+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;1,200;1,400&display=swap" rel="stylesheet">
+
+<style>
+/* =========================================================
+   DESIGN TOKENS — Soldo Brand · WCAG 2.2 AA verified
+   ─────────────────────────────────────────────────────
+   Brand palette:
+     Soldo Orange  #FF7D0A   (UI chrome, icons, borders, large display)
+     Soldo Grey    #E8E8EA   (surfaces, backgrounds)
+     Soldo Black   #000000   (primary text, dark backgrounds)
+
+   Contrast audit (WCAG AA: 4.5:1 text, 3:1 large/UI):
+     --text-primary  (#000)    on white:          21:1  ✓
+     --text-primary  (#000)    on --surface-alt:  17.2:1 ✓
+     --text-secondary (#3d3d3d) on white:          11.2:1 ✓
+     --text-muted    (#6b6b70) on white:           5.3:1  ✓
+     --accent-text   (#a84d00) on white:           5.6:1  ✓  (small text)
+     --accent        (#ff7d0a) on white:           2.6:1  ✗  UI/icon only ≥3px
+     --accent        (#ff7d0a) on --surface-alt:   2.1:1  → decorative only
+     Black (#000) on --accent  (#ff7d0a):          8.2:1  ✓  (button label)
+     Focus rings: 3px solid #a84d00, offset 2px   ✓
+========================================================= */
+:root {
+  /* ── Brand primitives ── */
+  --brand-orange:    #FF7D0A;
+  --brand-grey:      #E8E8EA;
+  --brand-black:     #000000;
+
+  /* ── Text ── */
+  --text-primary:    #000000;        /* 21:1 on white ✓ */
+  --text-secondary:  #3d3d3d;        /* 11.2:1 on white ✓ */
+  --text-muted:      #6b6b70;        /* 5.3:1 on white ✓ */
+
+  /* ── Accent ── */
+  --accent:          #FF7D0A;        /* UI chrome, icons, borders, large text only */
+  --accent-hover:    #e06500;        /* darker on interaction */
+  --accent-text:     #a84d00;        /* 5.6:1 on white — safe for small text ✓ */
+  --accent-light:    #fff3e8;        /* warm orange tint surface */
+  --accent-border:   #ffc589;        /* orange border on light bg */
+
+  /* ── Semantic ── */
+  --success:         #1a5c34;
+  --success-bg:      #e6f4ed;
+  --warning:         #7a4800;
+  --warning-bg:      #fff3e0;
+  --info:            #0f4c81;
+  --info-bg:         #e8f1fb;
+
+  /* ── Surfaces ── */
+  --surface:         #ffffff;
+  --surface-alt:     #F4F4F5;        /* grey 96% — derived from brand grey, lighter */
+  --surface-grey:    #E8E8EA;        /* brand grey — section backgrounds */
+  --surface-dark:    #000000;        /* brand black — dark sections */
+
+  /* ── Borders ── */
+  --border:          #d4d4d6;        /* warm grey border */
+  --border-strong:   #a8a8ab;        /* stronger dividers */
+
+  /* ── Shadows (warm black tint) ── */
+  --shadow-sm:       0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md:       0 4px 12px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg:       0 12px 32px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.07);
+
+  /* ── Radii ── */
+  --radius-sm:       6px;
+  --radius-md:       10px;
+  --radius-lg:       16px;
+  --radius-xl:       24px;
+
+  /* ── Typography ── */
+  --font-display:    'Jost', system-ui, sans-serif;
+  --font-body:       'Open Sans', system-ui, sans-serif;
+
+  /* ── Spacing ── */
+  --space-xs:        4px;
+  --space-sm:        8px;
+  --space-md:        16px;
+  --space-lg:        24px;
+  --space-xl:        40px;
+  --space-2xl:       64px;
+  --max-width:       760px;
+  --content-width:   680px;
+}
+
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 200;
+  line-height: 1.7;
+  color: var(--text-primary);
+  background: var(--surface-alt);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Display / heading base weight — 200, bumped by utility where needed */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 200;
+}
+
+/* ── WCAG 2.2 Focus Styles — #a84d00 = 5.6:1 on white ✓ */
+:focus-visible {
+  outline: 3px solid var(--accent-text);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Page Layout ── */
+.page-wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-lg);
+}
+
+.library-header {
+  text-align: center;
+  padding: var(--space-2xl) 0 var(--space-xl);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-2xl);
+}
+
+.library-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--accent-light);
+  color: var(--accent-text);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 100px;
+  margin-bottom: var(--space-md);
+  border: 1px solid var(--accent-border);
+}
+
+.library-badge svg { width: 14px; height: 14px; }
+
+.library-header h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 200;
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin-bottom: var(--space-md);
+}
+
+.library-header p {
+  font-size: 17px;
+  color: var(--text-secondary);
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* ── Section Headers ── */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.section-label h2 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 200;
+  color: var(--text-primary);
+}
+
+.section-label .section-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--accent);
+  color: #000000;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.component-section {
+  margin-bottom: var(--space-2xl);
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.component-desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: var(--space-xl);
+  padding: var(--space-md);
+  background: var(--surface-alt);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--accent-border);
+}
+
+.demo-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.component-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+/* =========================================================
+   1. ACCORDION
+========================================================= */
+.accordion {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.accordion-item {
+  border-bottom: 1px solid var(--border);
+}
+
+.accordion-item:last-child { border-bottom: none; }
+
+.accordion-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-xl);
+  background: var(--surface);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+  transition: background 0.15s ease;
+  min-height: 44px; /* WCAG 2.5.8 target size */
+}
+
+.accordion-trigger:hover { background: var(--surface-alt); }
+
+.accordion-trigger[aria-expanded="true"] {
+  background: var(--accent-light);
+  color: var(--accent-text);
+}
+
+.accordion-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--text-muted);
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), color 0.15s;
+}
+
+.accordion-trigger[aria-expanded="true"] .accordion-icon {
+  transform: rotate(180deg);
+  color: var(--accent-text);
+}
+
+.accordion-panel {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+.accordion-panel[data-open="true"] {
+  max-height: 600px;
+}
+
+.accordion-body {
+  padding: 0 var(--space-xl) var(--space-lg);
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+
+/* Accordion with image variant */
+.accordion-with-image .accordion-body {
+  display: grid;
+  grid-template-columns: 1fr 200px;
+  gap: var(--space-xl);
+  align-items: start;
+  padding-top: var(--space-md);
+}
+
+.accordion-body-text { grid-column: 1; }
+
+.accordion-body-image {
+  grid-column: 2;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.accordion-body-image .img-placeholder {
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: linear-gradient(135deg, var(--accent-light) 0%, var(--border) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .accordion-with-image .accordion-body {
+    grid-template-columns: 1fr;
+  }
+  .accordion-body-image { grid-column: 1; }
+}
+
+/* =========================================================
+   2. HORIZONTAL TABS
+========================================================= */
+.tabs-horizontal {
+  --tab-border: var(--border);
+}
+
+.tabs-horizontal .tab-list {
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  gap: 0;
+}
+
+.tabs-horizontal .tab-list::-webkit-scrollbar { display: none; }
+
+.tabs-horizontal .tab-btn {
+  flex-shrink: 0;
+  padding: var(--space-md) var(--space-lg);
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+  min-height: 44px;
+  position: relative;
+}
+
+.tabs-horizontal .tab-btn:hover { color: var(--text-primary); }
+
+.tabs-horizontal .tab-btn[aria-selected="true"] {
+  color: var(--accent-text);
+  border-bottom-color: var(--accent-text);
+}
+
+.tab-panel { display: none; padding-top: var(--space-xl); }
+.tab-panel.is-active { display: block; }
+
+.tab-panel-inner {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+
+/* =========================================================
+   3. VERTICAL TABS
+========================================================= */
+.tabs-vertical {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+.tabs-vertical .tab-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-right: 1px solid var(--border);
+  padding-right: var(--space-md);
+}
+
+.tabs-vertical .tab-btn {
+  padding: 12px var(--space-md);
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.tabs-vertical .tab-btn:hover {
+  background: var(--surface-alt);
+  color: var(--text-primary);
+}
+
+.tabs-vertical .tab-btn[aria-selected="true"] {
+  background: var(--accent-light);
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.tabs-vertical .tab-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.tabs-vertical .tab-content {
+  padding-left: var(--space-md);
+}
+
+.tabs-vertical .tab-panel {
+  display: none;
+  padding-top: 0;
+}
+.tabs-vertical .tab-panel.is-active { display: block; }
+
+@media (max-width: 640px) {
+  .tabs-vertical {
+    grid-template-columns: 1fr;
+  }
+  .tabs-vertical .tab-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding-right: 0;
+    padding-bottom: var(--space-md);
+  }
+}
+
+/* =========================================================
+   4. CTA BLOCKS
+========================================================= */
+
+/* Inline CTA */
+.cta-inline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-xl);
+  background: var(--accent-light);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-lg);
+  flex-wrap: wrap;
+}
+
+.cta-inline .cta-text {
+  flex: 1;
+  min-width: 200px;
+}
+
+.cta-inline .cta-text strong {
+  display: block;
+  font-size: 16px;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.cta-inline .cta-text span {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Banner CTA */
+.cta-banner {
+  background: var(--brand-black);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl) var(--space-2xl);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-xl);
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-banner::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255,125,10,0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cta-banner .cta-banner-text h3 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 200;
+  color: white;
+  margin-bottom: var(--space-sm);
+}
+
+.cta-banner .cta-banner-text p {
+  font-size: 15px;
+  color: rgba(255,255,255,0.75);
+}
+
+.cta-banner-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .cta-banner {
+    grid-template-columns: 1fr;
+    padding: var(--space-xl);
+  }
+  .cta-banner-actions { align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
+}
+
+/* Sticky inline CTA strip */
+.cta-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  flex-wrap: wrap;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid transparent;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s, box-shadow 0.15s;
+  min-height: 44px; /* WCAG 2.5.8 */
+  white-space: nowrap;
+}
+
+.btn:active { transform: translateY(1px); }
+
+.btn-primary {
+  background: var(--accent);
+  color: #000000;              /* black on #FF7D0A = 8.2:1 ✓ */
+  border-color: var(--accent);
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  box-shadow: 0 4px 12px rgba(255,125,10,0.35);
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+.btn-secondary:hover {
+  background: var(--accent-light);
+}
+
+.btn-ghost-white {
+  background: rgba(255,255,255,0.1);
+  color: white;
+  border-color: rgba(255,255,255,0.3);
+}
+.btn-ghost-white:hover {
+  background: rgba(255,255,255,0.2);
+  border-color: rgba(255,255,255,0.5);
+}
+
+.btn-white {
+  background: white;
+  color: var(--text-primary);
+  border-color: white;
+}
+.btn-white:hover {
+  background: var(--accent-light);
+  color: var(--accent-text);
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 13px;
+  min-height: 36px;
+}
+
+/* =========================================================
+   5. LISTS & BULLETS
+========================================================= */
+
+/* Check list */
+.list-check {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.list-check li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.list-check li::before {
+  content: '';
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  background: var(--success-bg);
+  border-radius: 50%;
+  margin-top: 2px;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='10' viewBox='0 0 12 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 5L4.5 8.5L11 1' stroke='%230b6b3e' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Numbered step list */
+.list-steps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  counter-reset: steps;
+}
+
+.list-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-lg);
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  counter-increment: steps;
+  position: relative;
+}
+
+.list-steps li::before {
+  content: counter(steps);
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  background: var(--accent);
+  color: #000000;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.list-steps li .step-content strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+/* Icon list */
+.list-icon {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.list-icon li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  font-size: 15px;
+  color: var(--text-secondary);
+  padding: 10px var(--space-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.list-icon li .icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--accent-text);
+}
+
+.list-icon li .icon-wrap svg { width: 16px; height: 16px; }
+
+/* Two-column list */
+.list-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm) var(--space-xl);
+}
+
+@media (max-width: 480px) {
+  .list-two-col { grid-template-columns: 1fr; }
+}
+
+/* =========================================================
+   6. TABLES
+========================================================= */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table-wrap caption {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: left;
+  padding: var(--space-md) var(--space-lg);
+  caption-side: top;
+}
+
+.table-wrap thead th {
+  background: var(--surface-alt);
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  padding: 12px var(--space-lg);
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+.table-wrap tbody td {
+  padding: 12px var(--space-lg);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.table-wrap tbody tr:last-child td { border-bottom: none; }
+
+.table-wrap tbody tr:hover td { background: var(--surface-alt); }
+
+.table-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tag-green { background: var(--success-bg); color: var(--success); }
+.tag-yellow { background: var(--warning-bg); color: var(--warning); }
+.tag-blue { background: var(--accent-light); color: var(--accent-text); }
+
+/* Comparison table */
+.table-compare thead th { text-align: center; }
+.table-compare thead th:first-child { text-align: left; }
+.table-compare td { text-align: center; }
+.table-compare td:first-child { text-align: left; font-weight: 500; color: var(--text-primary); }
+
+.check-yes, .check-no {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+}
+.check-yes { background: var(--success-bg); color: var(--success); }
+.check-no { background: #fde8e8; color: #b00020; }
+
+/* =========================================================
+   7. CALLOUT / ALERT BLOCKS
+========================================================= */
+.callout {
+  display: flex;
+  gap: var(--space-lg);
+  padding: var(--space-lg) var(--space-xl);
+  border-radius: var(--radius-lg);
+  align-items: flex-start;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.callout svg { flex-shrink: 0; width: 20px; height: 20px; margin-top: 2px; }
+
+.callout-info { background: var(--accent-light); border: 1px solid var(--accent-border); color: var(--accent-text); }
+.callout-success { background: var(--success-bg); border: 1px solid #a8d8be; color: var(--success); }
+.callout-warning { background: var(--warning-bg); border: 1px solid #ffc966; color: var(--warning); }
+.callout-tip { background: var(--surface-grey); border: 1px solid var(--border-strong); color: var(--text-secondary); }
+
+.callout strong { display: block; margin-bottom: 4px; font-weight: 600; }
+
+/* =========================================================
+   8. STAT / HIGHLIGHT CARDS
+========================================================= */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-md);
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg) var(--space-xl);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.stat-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.stat-card .stat-number {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  color: var(--accent-text);
+  line-height: 1;
+  margin-bottom: var(--space-xs);
+}
+
+.stat-card .stat-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.stat-card .stat-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* =========================================================
+   9. QUOTE / TESTIMONIAL
+========================================================= */
+.blockquote-editorial {
+  border-left: 4px solid var(--accent);
+  padding: var(--space-md) 0 var(--space-md) var(--space-xl);
+  margin: 0;
+}
+
+.blockquote-editorial p {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-style: italic;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-bottom: var(--space-md);
+}
+
+.blockquote-editorial cite {
+  font-size: 13px;
+  font-style: normal;
+  color: var(--text-muted);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.blockquote-editorial cite::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 2px;
+  background: var(--border-strong);
+}
+
+.testimonial-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.testimonial-card .quote-mark {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  color: var(--accent-border);
+  line-height: 0.8;
+  margin-bottom: var(--space-sm);
+}
+
+.testimonial-card p {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  margin-bottom: var(--space-lg);
+}
+
+.testimonial-card .attribution {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.attribution-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-light), var(--accent-border));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-text);
+  flex-shrink: 0;
+}
+
+.attribution-info strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.attribution-info span {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* =========================================================
+   10. RICH TEXT / PROSE
+========================================================= */
+.prose {
+  max-width: 680px;
+  font-size: 17px;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+
+.prose h2 {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 200;
+  color: var(--text-primary);
+  line-height: 1.3;
+  margin-bottom: var(--space-md);
+  margin-top: var(--space-xl);
+}
+
+.prose h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+  margin-top: var(--space-lg);
+}
+
+.prose p { margin-bottom: var(--space-md); }
+
+.prose a {
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.prose a:hover { color: var(--accent-hover); }
+
+.prose strong { color: var(--text-primary); font-weight: 600; }
+
+.prose code {
+  font-size: 0.875em;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: var(--text-primary);
+}
+
+/* =========================================================
+   11. PROGRESS / READING INDICATOR
+========================================================= */
+.reading-progress {
+  position: relative;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: var(--space-md);
+}
+
+.reading-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #ffb366);
+  border-radius: 2px;
+  transition: width 0.2s ease;
+}
+
+/* =========================================================
+   12. TOC — Table of Contents
+========================================================= */
+.toc {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg) var(--space-xl);
+}
+
+.toc-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: var(--space-md);
+}
+
+.toc ol {
+  list-style: none;
+  counter-reset: toc;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.toc ol li {
+  counter-increment: toc;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  font-size: 14px;
+}
+
+.toc ol li::before {
+  content: counter(toc) ".";
+  color: var(--accent-text);
+  font-weight: 700;
+  font-size: 12px;
+  min-width: 18px;
+}
+
+.toc ol li a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  line-height: 1.5;
+  transition: color 0.15s;
+}
+
+.toc ol li a:hover { color: var(--accent-text); }
+
+/* =========================================================
+   13. FEATURE / CONTENT CARDS
+========================================================= */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-md);
+}
+
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+}
+
+.feature-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--accent-border);
+}
+
+.feature-card .feature-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--accent-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-md);
+  color: var(--accent-text);
+}
+
+.feature-card .feature-icon svg { width: 22px; height: 22px; }
+
+.feature-card h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.feature-card p {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+/* =========================================================
+   UTILITY
+========================================================= */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: var(--space-xl) 0;
+}
+
+.text-sm { font-size: 14px; }
+.text-muted { color: var(--text-muted); }
+.mt-md { margin-top: var(--space-md); }
+.mt-lg { margin-top: var(--space-lg); }
+.flex-gap { display: flex; gap: var(--space-sm); flex-wrap: wrap; }
+
+/* SKIP LINK — WCAG 2.4.1 */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: var(--space-md);
+  background: var(--accent);
+  color: #000000;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 1000;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+.skip-link:focus { top: 0; }
+
+/* =========================================================
+   CONTENT LAYOUT BLOCKS
+   13–20: Text+image, editorial, columns, pull quote,
+          timeline, before/after, image grid
+========================================================= */
+
+/* ── Shared layout wrapper ── */
+.layout-block {
+  /* Used as outer wrapper for contained blocks — inherits
+     component-section styles when that class is also applied */
+}
+
+/* ── Full-bleed wrapper (breaks out of page-wrap) ── */
+.full-bleed {
+  margin-left: calc(-1 * var(--space-lg));
+  margin-right: calc(-1 * var(--space-lg));
+  border-radius: 0;
+}
+
+/* =========================================================
+   13. TEXT + IMAGE — 50/50
+========================================================= */
+.split-50 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2xl);
+  align-items: center;
+}
+
+.split-50.reverse { direction: rtl; }
+.split-50.reverse > * { direction: ltr; }
+
+.split-text { display: flex; flex-direction: column; gap: var(--space-md); }
+
+.split-text .eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+.split-text h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+  font-weight: 200;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.split-text p {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+
+.split-text .split-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent-text);
+  text-decoration: none;
+  margin-top: var(--space-sm);
+  transition: gap 0.2s;
+}
+
+.split-text .split-link:hover { gap: 10px; }
+.split-text .split-link svg { width: 14px; height: 14px; }
+
+.split-media {
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, var(--accent-light) 0%, var(--surface-grey) 100%);
+  aspect-ratio: 4/3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.split-media .media-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--accent-text);
+  opacity: 0.6;
+}
+
+.split-media .media-placeholder svg { width: 40px; height: 40px; }
+.split-media .media-placeholder span { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; }
+
+/* Media decorative badge */
+.split-media .media-badge {
+  position: absolute;
+  bottom: var(--space-md);
+  left: var(--space-md);
+  background: white;
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.split-media .media-badge .badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  flex-shrink: 0;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.85); }
+}
+
+@media (max-width: 700px) {
+  .split-50 { grid-template-columns: 1fr; gap: var(--space-xl); }
+  .split-50.reverse { direction: ltr; }
+  .split-50.reverse .split-media { order: -1; }
+}
+
+/* =========================================================
+   14. TEXT + IMAGE — 60/40
+========================================================= */
+.split-60 {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: var(--space-2xl);
+  align-items: center;
+}
+
+.split-60.reverse { grid-template-columns: 2fr 3fr; }
+.split-60.reverse .split-text { order: 2; }
+.split-60.reverse .split-media { order: 1; }
+
+.split-60 .split-media {
+  aspect-ratio: 3/4;
+  border-radius: var(--radius-xl);
+}
+
+@media (max-width: 700px) {
+  .split-60, .split-60.reverse { grid-template-columns: 1fr; gap: var(--space-xl); }
+  .split-60.reverse .split-text { order: unset; }
+  .split-60.reverse .split-media { order: unset; }
+}
+
+/* =========================================================
+   15. FULL-WIDTH EDITORIAL / CHAPTER INTRO
+========================================================= */
+.editorial-intro {
+  padding: var(--space-2xl) var(--space-xl);
+  background: var(--brand-black);
+  color: white;
+  border-radius: var(--radius-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.editorial-intro::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 60% at 80% 20%, rgba(255,125,10,0.20) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 10% 80%, rgba(255,179,102,0.10) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.editorial-intro-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+}
+
+.editorial-intro .chapter-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: var(--space-lg);
+}
+
+.editorial-intro .chapter-label::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 1px;
+  background: rgba(255,255,255,0.4);
+}
+
+.editorial-intro h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 200;
+  color: white;
+  line-height: 1.2;
+  margin-bottom: var(--space-lg);
+}
+
+.editorial-intro .intro-lead {
+  font-size: 17px;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.75);
+  margin-bottom: var(--space-xl);
+}
+
+.editorial-intro .intro-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+.intro-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.intro-meta-item .meta-value {
+  font-size: 1.5rem;
+  font-family: var(--font-display);
+  color: white;
+  line-height: 1;
+}
+
+.intro-meta-item .meta-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  font-weight: 500;
+}
+
+/* Light variant */
+.editorial-intro.editorial-light {
+  background: var(--accent-light);
+}
+
+.editorial-intro.editorial-light::before {
+  background: radial-gradient(ellipse 60% 60% at 90% 10%, rgba(255,125,10,0.08) 0%, transparent 60%);
+}
+
+.editorial-intro.editorial-light .chapter-label { color: var(--accent-text); }
+.editorial-intro.editorial-light .chapter-label::before { background: var(--accent-border); }
+.editorial-intro.editorial-light h2 { color: var(--text-primary); }
+.editorial-intro.editorial-light .intro-lead { color: var(--text-secondary); }
+.editorial-intro.editorial-light .meta-value { color: var(--accent-text); }
+.editorial-intro.editorial-light .meta-label { color: var(--text-muted); }
+
+/* =========================================================
+   16. COLUMN LAYOUTS — 2-col & 3-col text
+========================================================= */
+.col-layout {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+.col-2 { grid-template-columns: 1fr 1fr; }
+.col-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+.col-item {}
+
+.col-item .col-heading {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  border-bottom: 2px solid var(--accent-border);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.col-item p {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+
+/* Ruled variant — vertical dividers */
+.col-layout.col-ruled {
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.col-layout.col-ruled .col-item {
+  padding: var(--space-xl);
+  border-right: 1px solid var(--border);
+}
+
+.col-layout.col-ruled .col-item:last-child { border-right: none; }
+
+/* Shaded alternate */
+.col-layout.col-shaded .col-item:nth-child(even) {
+  background: var(--surface-alt);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+}
+
+@media (max-width: 700px) {
+  .col-2 { grid-template-columns: 1fr; }
+  .col-3 { grid-template-columns: 1fr; }
+  .col-layout.col-ruled .col-item {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .col-layout.col-ruled .col-item:last-child { border-bottom: none; }
+}
+
+@media (min-width: 480px) and (max-width: 700px) {
+  .col-3 { grid-template-columns: 1fr 1fr; }
+}
+
+/* =========================================================
+   17. PULL QUOTE / BIG NUMBER BREAKOUT
+========================================================= */
+.pull-quote-block {
+  text-align: center;
+  padding: var(--space-2xl) var(--space-xl);
+  position: relative;
+}
+
+.pull-quote-block.pq-contained {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.pull-quote-block.pq-accent {
+  background: var(--accent-light);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-xl);
+}
+
+.pull-quote-block.pq-dark {
+  background: var(--brand-black);
+  border-radius: var(--radius-xl);
+}
+
+.pull-quote-block .pq-quotemark {
+  font-family: var(--font-display);
+  font-size: 5rem;
+  line-height: 0.6;
+  color: var(--accent-border);
+  margin-bottom: var(--space-md);
+  display: block;
+}
+
+.pq-dark .pq-quotemark { color: rgba(255,255,255,0.15); }
+
+.pull-quote-block .pq-text {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-style: italic;
+  color: var(--text-primary);
+  line-height: 1.5;
+  max-width: 640px;
+  margin: 0 auto var(--space-lg);
+}
+
+.pq-dark .pq-text { color: white; }
+
+.pull-quote-block .pq-cite {
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.pq-dark .pq-cite { color: rgba(255,255,255,0.5); }
+.pq-accent .pq-text { color: var(--text-primary); }
+
+/* Big number variant */
+.big-number-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.big-number-item {
+  background: var(--surface);
+  padding: var(--space-xl) var(--space-lg);
+  text-align: center;
+}
+
+.big-number-item .bn-value {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, 3.5rem);
+  color: var(--accent-text);
+  line-height: 1;
+  margin-bottom: var(--space-xs);
+}
+
+.big-number-item .bn-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.big-number-item .bn-source {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* =========================================================
+   18. TIMELINE — horizontal & vertical
+========================================================= */
+
+/* Vertical timeline */
+.timeline-vertical {
+  position: relative;
+  padding-left: 32px;
+}
+
+.timeline-vertical::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-border) 100%);
+  border-radius: 2px;
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: var(--space-xl);
+}
+
+.timeline-item:last-child { padding-bottom: 0; }
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -26px;
+  top: 6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3px solid var(--surface);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.timeline-item.tl-complete::before {
+  background: var(--success);
+  box-shadow: 0 0 0 2px var(--success);
+}
+
+.timeline-item.tl-future::before {
+  background: var(--surface);
+  box-shadow: 0 0 0 2px var(--border-strong);
+}
+
+.tl-date {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+  margin-bottom: 4px;
+}
+
+.tl-complete .tl-date { color: var(--success); }
+.tl-future .tl-date { color: var(--text-muted); }
+
+.tl-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.tl-future .tl-title { color: var(--text-muted); }
+
+.tl-body {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+/* Horizontal timeline */
+.timeline-horizontal {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0;
+  position: relative;
+  padding-top: var(--space-xl);
+}
+
+.timeline-horizontal::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-border) 100%);
+}
+
+.timeline-h-item {
+  padding: var(--space-xl) var(--space-md) 0;
+  position: relative;
+  text-align: center;
+}
+
+.timeline-h-item::before {
+  content: '';
+  position: absolute;
+  top: -var(--space-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  top: calc(-1 * var(--space-xl) + 4px);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3px solid var(--surface);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.timeline-h-item .tl-step {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+  margin-bottom: 4px;
+}
+
+.timeline-h-item .tl-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.timeline-h-item .tl-body {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .timeline-horizontal { grid-template-columns: 1fr 1fr; }
+  .timeline-horizontal::before { display: none; }
+  .timeline-h-item::before { display: none; }
+  .timeline-h-item { padding-top: var(--space-md); text-align: left; }
+}
+
+/* =========================================================
+   19. BEFORE / AFTER SPLIT PANEL
+========================================================= */
+.before-after {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+.ba-panel {
+  padding: var(--space-xl);
+}
+
+.ba-before {
+  background: var(--surface-alt);
+  border-right: 1px solid var(--border);
+}
+
+.ba-after {
+  background: var(--accent-light);
+}
+
+.ba-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-lg);
+  padding: 4px 12px;
+  border-radius: 100px;
+}
+
+.ba-before .ba-label {
+  background: var(--border);
+  color: var(--text-muted);
+}
+
+.ba-after .ba-label {
+  background: var(--accent);
+  color: #000000;
+}
+
+.ba-heading {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-md);
+  line-height: 1.4;
+}
+
+.ba-after .ba-heading { color: var(--text-primary); }
+
+.ba-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ba-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.ba-before .ba-list li::before {
+  content: '–';
+  color: var(--border-strong);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.ba-after .ba-list li::before {
+  content: '';
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='8' viewBox='0 0 10 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4L3.5 6.5L9 1' stroke='%230b6b3e' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+@media (max-width: 600px) {
+  .before-after { grid-template-columns: 1fr; }
+  .ba-before { border-right: none; border-bottom: 1px solid var(--border); }
+}
+
+/* =========================================================
+   20. IMAGE GRID — 2-up, 3-up, mosaic
+========================================================= */
+.img-grid { display: grid; gap: var(--space-md); }
+
+.img-grid-2up { grid-template-columns: 1fr 1fr; }
+
+.img-grid-3up { grid-template-columns: 1fr 1fr 1fr; }
+
+.img-grid-mosaic {
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: auto auto;
+}
+
+.img-grid-mosaic .img-cell:first-child {
+  grid-row: 1 / 3;
+}
+
+.img-cell {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--surface-alt) 0%, var(--accent-light) 100%);
+  position: relative;
+}
+
+.img-cell .cell-inner {
+  aspect-ratio: 4/3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  color: var(--accent-text);
+  opacity: 0.65;
+}
+
+.img-grid-mosaic .img-cell:first-child .cell-inner {
+  aspect-ratio: unset;
+  height: 100%;
+  min-height: 280px;
+}
+
+.img-cell .cell-inner svg { width: 28px; height: 28px; }
+.img-cell .cell-inner span { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-align: center; }
+
+/* Caption below grid */
+.img-grid-caption {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: var(--space-sm);
+  font-style: italic;
+}
+
+@media (max-width: 600px) {
+  .img-grid-2up { grid-template-columns: 1fr; }
+  .img-grid-3up { grid-template-columns: 1fr 1fr; }
+  .img-grid-mosaic { grid-template-columns: 1fr; }
+  .img-grid-mosaic .img-cell:first-child { grid-row: auto; }
+  .img-grid-mosaic .img-cell:first-child .cell-inner { min-height: 200px; }
+}
+
+/* ── Section divider between layout groups ── */
+.layout-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin: var(--space-xl) 0;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.layout-divider::before,
+.layout-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<div class="page-wrap" id="main-content">
+
+  <!-- LIBRARY HEADER -->
+  <header class="library-header" role="banner">
+    <div class="library-badge" aria-label="WCAG 2.2 AA compliant component library">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.54 5.46L7 10l-2.54-2.54a.75.75 0 00-1.06 1.08l3.07 3.07a.75.75 0 001.06 0l5.07-5.07a.75.75 0 00-1.06-1.08z"/></svg>
+      WCAG 2.2 AA · Pillar Page Components
+    </div>
+    <h1>Content Component Library</h1>
+    <p>Production-ready, accessible blocks for content-heavy pillar pages. Keyboard navigable, screen reader tested, contrast compliant.</p>
+  </header>
+
+  <!-- ========================================================= -->
+  <!-- 1. ACCORDION                                               -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-accordion">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">1</span>
+      <h2 id="section-accordion">Accordion</h2>
+    </div>
+    <p class="component-desc">ARIA: <code>button[aria-expanded]</code> + <code>[role="region"]</code> panels. Keyboard: Enter/Space toggles, Tab navigates between triggers. Single-open and multi-open variants.</p>
+
+    <div class="component-group">
+
+      <div>
+        <p class="demo-label">Standard Accordion</p>
+        <div class="accordion" id="accordion-basic" data-accordion="single">
+
+          <div class="accordion-item">
+            <h3>
+              <button class="accordion-trigger" id="acc-btn-1" aria-expanded="false" aria-controls="acc-panel-1">
+                What is spend management?
+                <svg class="accordion-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              </button>
+            </h3>
+            <div id="acc-panel-1" role="region" aria-labelledby="acc-btn-1" class="accordion-panel">
+              <div class="accordion-body">
+                <p>Spend management is the process of tracking, controlling, and optimising business expenditure across all company spending channels. It encompasses everything from employee expenses and supplier invoices to subscription services and corporate card transactions.</p>
+                <p class="mt-md">A robust spend management system gives finance teams real-time visibility into where money is going, enabling faster month-end closes and better budget forecasting.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h3>
+              <button class="accordion-trigger" id="acc-btn-2" aria-expanded="false" aria-controls="acc-panel-2">
+                How does Soldo integrate with accounting software?
+                <svg class="accordion-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              </button>
+            </h3>
+            <div id="acc-panel-2" role="region" aria-labelledby="acc-btn-2" class="accordion-panel">
+              <div class="accordion-body">
+                <p>Soldo connects natively with Xero, QuickBooks, NetSuite, and Sage. Transactions sync automatically, complete with receipts, VAT codes, and account mapping — eliminating manual reconciliation entirely.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h3>
+              <button class="accordion-trigger" id="acc-btn-3" aria-expanded="false" aria-controls="acc-panel-3">
+                What card controls are available?
+                <svg class="accordion-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              </button>
+            </h3>
+            <div id="acc-panel-3" role="region" aria-labelledby="acc-btn-3" class="accordion-panel">
+              <div class="accordion-body">
+                <p>Finance managers can set per-card spending limits, restrict merchant categories, lock cards instantly, and define budget rules per team or project. All controls are applied in real time from the web dashboard or mobile app.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div>
+        <p class="demo-label">Accordion with Image</p>
+        <div class="accordion accordion-with-image" id="accordion-image" data-accordion="single">
+          <div class="accordion-item">
+            <h3>
+              <button class="accordion-trigger" id="acc-img-btn-1" aria-expanded="false" aria-controls="acc-img-panel-1">
+                Real-time receipt capture
+                <svg class="accordion-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              </button>
+            </h3>
+            <div id="acc-img-panel-1" role="region" aria-labelledby="acc-img-btn-1" class="accordion-panel">
+              <div class="accordion-body">
+                <div class="accordion-body-text">
+                  <p>Employees capture receipts instantly via the Soldo app. The transaction and receipt are matched automatically, flagging any missing documentation before month-end — not after.</p>
+                  <p class="mt-md">This eliminates the classic "shoebox of receipts" problem and gives finance a clean, audit-ready record at all times.</p>
+                </div>
+                <div class="accordion-body-image">
+                  <div class="img-placeholder" role="img" aria-label="Screenshot of Soldo receipt capture interface">
+                    Receipt UI preview
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h3>
+              <button class="accordion-trigger" id="acc-img-btn-2" aria-expanded="false" aria-controls="acc-img-panel-2">
+                Budget enforcement in real time
+                <svg class="accordion-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              </button>
+            </h3>
+            <div id="acc-img-panel-2" role="region" aria-labelledby="acc-img-btn-2" class="accordion-panel">
+              <div class="accordion-body">
+                <div class="accordion-body-text">
+                  <p>Set per-card, per-team, or per-project budgets. When a limit is reached, the card declines automatically — no surprises at month-end, no awkward conversations after the fact.</p>
+                </div>
+                <div class="accordion-body-image">
+                  <div class="img-placeholder" role="img" aria-label="Budget enforcement dashboard screenshot">
+                    Budget UI preview
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 2. HORIZONTAL TABS                                         -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-htabs">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">2</span>
+      <h2 id="section-htabs">Horizontal Tabs</h2>
+    </div>
+    <p class="component-desc">ARIA: <code>role="tablist"</code>, <code>role="tab"</code>, <code>role="tabpanel"</code>. Keyboard: Arrow keys navigate tabs, Tab moves to panel content, Home/End jump to first/last.</p>
+
+    <div class="tabs-horizontal" id="htabs-1">
+      <div role="tablist" aria-label="Expense management features" class="tab-list">
+        <button role="tab" id="htab-1" aria-selected="true" aria-controls="htabpanel-1" class="tab-btn" tabindex="0">Overview</button>
+        <button role="tab" id="htab-2" aria-selected="false" aria-controls="htabpanel-2" class="tab-btn" tabindex="-1">For Finance</button>
+        <button role="tab" id="htab-3" aria-selected="false" aria-controls="htabpanel-3" class="tab-btn" tabindex="-1">For Teams</button>
+        <button role="tab" id="htab-4" aria-selected="false" aria-controls="htabpanel-4" class="tab-btn" tabindex="-1">Integrations</button>
+      </div>
+
+      <div id="htabpanel-1" role="tabpanel" aria-labelledby="htab-1" class="tab-panel is-active">
+        <div class="tab-panel-inner">
+          <h3 style="font-size:1.1rem;font-weight:600;color:var(--text-primary);margin-bottom:var(--space-md)">What is Soldo?</h3>
+          <p>Soldo is a spend management platform that combines prepaid Mastercard cards with a real-time control dashboard. Finance teams gain full visibility into company spending the moment it happens — not weeks later.</p>
+          <ul class="list-check mt-md">
+            <li>Prepaid Mastercards for every team and project</li>
+            <li>Real-time transaction data with receipt matching</li>
+            <li>Automated bookkeeping sync to Xero, QuickBooks, Sage</li>
+            <li>Custom rules, budgets, and merchant controls</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="htabpanel-2" role="tabpanel" aria-labelledby="htab-2" class="tab-panel" hidden>
+        <div class="tab-panel-inner">
+          <h3 style="font-size:1.1rem;font-weight:600;color:var(--text-primary);margin-bottom:var(--space-md)">Built for finance teams</h3>
+          <p>Soldo gives CFOs and finance managers the controls they need without creating friction for the rest of the business. Budget rules, approval workflows, and automated reconciliation all live in one place.</p>
+          <ul class="list-check mt-md">
+            <li>Month-end close in hours, not days</li>
+            <li>Automated VAT coding and receipt matching</li>
+            <li>Real-time budget vs actuals across all teams</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="htabpanel-3" role="tabpanel" aria-labelledby="htab-3" class="tab-panel" hidden>
+        <div class="tab-panel-inner">
+          <h3 style="font-size:1.1rem;font-weight:600;color:var(--text-primary);margin-bottom:var(--space-md)">Empowering teams to spend wisely</h3>
+          <p>With their own Soldo card, employees don't need to use personal funds or wait for reimbursements. Managers set the rules upfront, so teams can operate independently within defined guardrails.</p>
+        </div>
+      </div>
+
+      <div id="htabpanel-4" role="tabpanel" aria-labelledby="htab-4" class="tab-panel" hidden>
+        <div class="tab-panel-inner">
+          <h3 style="font-size:1.1rem;font-weight:600;color:var(--text-primary);margin-bottom:var(--space-md)">Connect your existing tools</h3>
+          <p>Soldo integrates with the accounting software you already use. Native connections to Xero, QuickBooks, Sage, and NetSuite mean transactions flow directly into your books — no manual exports, no data entry.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 3. VERTICAL TABS                                           -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-vtabs">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">3</span>
+      <h2 id="section-vtabs">Vertical Tabs</h2>
+    </div>
+    <p class="component-desc">Same ARIA pattern as horizontal tabs. Ideal for feature breakdowns or multi-section guides where labels need persistent visibility. Collapses to horizontal on mobile.</p>
+
+    <div class="tabs-vertical" id="vtabs-1">
+      <div role="tablist" aria-label="Industry use cases" aria-orientation="vertical" class="tab-list">
+        <button role="tab" id="vtab-1" aria-selected="true" aria-controls="vtabpanel-1" class="tab-btn" tabindex="0">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M2 6a6 6 0 1110.89 3.477l4.817 4.816a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 6z"/></svg>
+          Retail
+        </button>
+        <button role="tab" id="vtab-2" aria-selected="false" aria-controls="vtabpanel-2" class="tab-btn" tabindex="-1">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4 4v.126A2 2 0 002.126 6H2v8h12V6h-.126A2 2 0 0012 4.126V4a4 4 0 00-8 0zm4-2a2 2 0 00-2 2v.126a2.001 2.001 0 011.374 1.374H9.5a2.001 2.001 0 011.374-1.374V4a2 2 0 00-2-2z"/></svg>
+          Agencies
+        </button>
+        <button role="tab" id="vtab-3" aria-selected="false" aria-controls="vtabpanel-3" class="tab-btn" tabindex="-1">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5 4a1 1 0 000 2h6a1 1 0 000-2H5zM3 8a1 1 0 011-1h8a1 1 0 110 2H4a1 1 0 01-1-1zm1 3a1 1 0 100 2h4a1 1 0 100-2H4z"/></svg>
+          Media
+        </button>
+        <button role="tab" id="vtab-4" aria-selected="false" aria-controls="vtabpanel-4" class="tab-btn" tabindex="-1">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M13.5 3A1.5 1.5 0 0115 4.5v3A1.5 1.5 0 0113.5 9H10v.5a.5.5 0 01-.5.5H7v1h1.5a.5.5 0 010 1h-5a.5.5 0 010-1H5v-1H2.5a.5.5 0 01-.5-.5V9H.5A1.5 1.5 0 01-1 7.5v-3A1.5 1.5 0 01.5 3z"/></svg>
+          Tech / SaaS
+        </button>
+      </div>
+
+      <div class="tab-content">
+        <div id="vtabpanel-1" role="tabpanel" aria-labelledby="vtab-1" class="tab-panel is-active">
+          <div class="tab-panel-inner">
+            <h3 style="font-size:1.05rem;font-weight:600;color:var(--text-primary);margin-bottom:var(--space-md)">Soldo for Retail</h3>
+            <p>Give store managers, buyers, and field teams individual Soldo cards loaded with the exact budget they need — no more petty cash drawers or out-of-pocket expenses. Every transaction is visible in real time from HQ.</p>
+            <ul class="list-check mt-md">
+              <li>Per-store budget envelopes with automatic limits</li>
+              <li>Buyer cards for trade shows and supplier meetings</li>
+              <li>Consolidated view across all locations</li>
+            </ul>
+          </div>
+        </div>
+        <div id="vtabpanel-2" role="tabpanel" aria-labelledby="vtab-2" class="tab-panel" hidden>
+          <div class="tab-panel-inner">
+            <h3 style="font-size:1.05rem;font-weight:600;color:var(--text-primary);margin-bottom:var(--space-md)">Soldo for Agencies</h3>
+            <p>Manage client media budgets, freelancer payments, and production costs with complete separation and transparency. Create virtual cards per client or campaign and close the books in minutes.</p>
+          </div>
+        </div>
+        <div id="vtabpanel-3" role="tabpanel" aria-labelledby="vtab-3" class="tab-panel" hidden>
+          <div class="tab-panel-inner">
+            <h3 style="font-size:1.05rem;font-weight:600;color:var(--text-primary);margin-bottom:var(--space-md)">Soldo for Media</h3>
+            <p>Fund production trips, freelance contributors, and advertising spend from a single platform. Receipts, approvals, and reconciliation are handled automatically — so your team can focus on the story.</p>
+          </div>
+        </div>
+        <div id="vtabpanel-4" role="tabpanel" aria-labelledby="vtab-4" class="tab-panel" hidden>
+          <div class="tab-panel-inner">
+            <h3 style="font-size:1.05rem;font-weight:600;color:var(--text-primary);margin-bottom:var(--space-md)">Soldo for Tech / SaaS</h3>
+            <p>Manage AWS, Google, Azure, and SaaS subscriptions with dedicated virtual cards and automated renewal alerts. Finance teams get a clean, categorised view of tool spend without chasing receipts.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 4. CTA BLOCKS                                              -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-cta">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">4</span>
+      <h2 id="section-cta">CTA Blocks</h2>
+    </div>
+    <p class="component-desc">All interactive targets meet WCAG 2.5.8 minimum 24×24px (44×44px recommended). Three intent levels: inline (low friction), strip (mid-funnel), banner (high-intent).</p>
+
+    <div class="component-group">
+
+      <div>
+        <p class="demo-label">Inline CTA — Low intent, contextual</p>
+        <div class="cta-inline" role="complementary" aria-label="Call to action: start free trial">
+          <div class="cta-text">
+            <strong>Ready to see Soldo in action?</strong>
+            <span>Set up takes under 5 minutes. No commitment required.</span>
+          </div>
+          <div class="flex-gap">
+            <a href="#" class="btn btn-primary">Start free trial</a>
+            <a href="#" class="btn btn-secondary">Book a demo</a>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <p class="demo-label">CTA Strip — Mid-page, persistent</p>
+        <div class="cta-strip" role="complementary" aria-label="Quick action bar">
+          <div>
+            <strong style="font-size:15px;color:var(--text-primary)">Take a product tour</strong>
+            <p class="text-sm text-muted" style="margin-top:2px">See every feature in 4 minutes</p>
+          </div>
+          <div class="flex-gap">
+            <a href="#" class="btn btn-primary btn-sm">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zM6.5 5.5l4 2.5-4 2.5V5.5z"/></svg>
+              Watch tour
+            </a>
+            <a href="#" class="btn btn-secondary btn-sm">Book demo</a>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <p class="demo-label">Banner CTA — High intent, end-of-section</p>
+        <div class="cta-banner" role="complementary" aria-label="Sign up call to action">
+          <div class="cta-banner-text">
+            <h3>Stop chasing receipts.<br>Start closing faster.</h3>
+            <p>Join 26,000+ businesses that run finance on Soldo.</p>
+          </div>
+          <div class="cta-banner-actions">
+            <a href="#" class="btn btn-primary">Get started — it's free</a>
+            <a href="#" class="btn btn-ghost-white">Talk to sales</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 5. LISTS & BULLETS                                         -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-lists">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">5</span>
+      <h2 id="section-lists">Lists &amp; Bullets</h2>
+    </div>
+    <p class="component-desc">All lists use semantic <code>&lt;ul&gt;</code>/<code>&lt;ol&gt;</code>. Custom bullets via CSS (no list-image hacks that break with large text). Step lists use <code>counter-reset</code>.</p>
+
+    <div class="component-group">
+
+      <div>
+        <p class="demo-label">Checklist</p>
+        <ul class="list-check" aria-label="Soldo feature checklist">
+          <li>Real-time transaction visibility across all cards</li>
+          <li>Automated receipt matching and VAT coding</li>
+          <li>Direct sync to Xero, QuickBooks, and Sage</li>
+          <li>Per-card and per-team budget enforcement</li>
+          <li>Physical and virtual Mastercards for every employee</li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="demo-label">Two-Column Checklist</p>
+        <ul class="list-check list-two-col" aria-label="Platform capabilities">
+          <li>Prepaid Mastercards</li>
+          <li>Virtual cards on demand</li>
+          <li>Spend rules and limits</li>
+          <li>Real-time alerts</li>
+          <li>Receipt scanning (OCR)</li>
+          <li>Xero & QuickBooks sync</li>
+          <li>Multi-currency support</li>
+          <li>Role-based permissions</li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="demo-label">Numbered Step List</p>
+        <ol class="list-steps" aria-label="Onboarding steps">
+          <li>
+            <div class="step-content">
+              <strong>Create your account</strong>
+              Provide your business details and complete identity verification. Takes under 3 minutes with Companies House integration.
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Add your team</strong>
+              Invite employees and assign cards with individual or shared budgets. No physical branch visit required.
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Connect your accounting software</strong>
+              Link Xero, QuickBooks, or Sage in a single click. Account mappings carry over from your existing setup.
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Start spending — with full control</strong>
+              Cards are active immediately. Every transaction flows into your dashboard and accounting tool in real time.
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div>
+        <p class="demo-label">Icon List (Feature Summary)</p>
+        <ul class="list-icon" aria-label="Key platform features">
+          <li>
+            <div class="icon-wrap" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 3A1.5 1.5 0 0115 4.5v5A1.5 1.5 0 0113.5 11H10a3 3 0 01-2 2.83V15h1a.5.5 0 010 1h-3a.5.5 0 010-1h1v-1.17A3 3 0 015 11H1.5A1.5 1.5 0 010 9.5v-5A1.5 1.5 0 011.5 3z"/></svg>
+            </div>
+            <span><strong>Multi-currency cards</strong> — spend in 150+ currencies at the real exchange rate</span>
+          </li>
+          <li>
+            <div class="icon-wrap" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 1a1 1 0 00-1 1v4.586a1 1 0 00.293.707l7 7a1 1 0 001.414 0l4.586-4.586a1 1 0 000-1.414l-7-7A1 1 0 005.586 1H2zm3.5 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3z"/></svg>
+            </div>
+            <span><strong>Smart categorisation</strong> — automatic merchant tagging with custom rules</span>
+          </li>
+          <li>
+            <div class="icon-wrap" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M2 3a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V3zm3 1h6v1H5V4zm0 3h4v1H5V7z" clip-rule="evenodd"/></svg>
+            </div>
+            <span><strong>Instant receipts</strong> — snap and attach from the mobile app at point of purchase</span>
+          </li>
+          <li>
+            <div class="icon-wrap" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm.75 4.75v3.69l2.78 2.78-1.06 1.06L7.25 9V4.75h1.5z"/></svg>
+            </div>
+            <span><strong>Approval workflows</strong> — define who can approve what, and up to what limit</span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 6. TABLES                                                  -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-tables">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">6</span>
+      <h2 id="section-tables">Tables</h2>
+    </div>
+    <p class="component-desc">Semantic <code>&lt;table&gt;</code> with <code>&lt;caption&gt;</code>, <code>&lt;thead&gt;</code>/<code>&lt;tbody&gt;</code>, and <code>scope</code> attributes on headers. Horizontally scrollable on small viewports.</p>
+
+    <div class="component-group">
+
+      <div>
+        <p class="demo-label">Standard Data Table</p>
+        <div class="table-wrap" role="region" aria-label="Soldo plan comparison">
+          <table>
+            <caption>Soldo pricing plans — all prices ex. VAT</caption>
+            <thead>
+              <tr>
+                <th scope="col">Plan</th>
+                <th scope="col">Monthly cost</th>
+                <th scope="col">Cards included</th>
+                <th scope="col">Accounting sync</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Starter</strong></td>
+                <td>£9 / mo</td>
+                <td>Up to 3</td>
+                <td>Xero only</td>
+                <td><span class="table-tag tag-green">Available</span></td>
+              </tr>
+              <tr>
+                <td><strong>Business</strong></td>
+                <td>£21 / mo</td>
+                <td>Up to 20</td>
+                <td>Xero, QuickBooks, Sage</td>
+                <td><span class="table-tag tag-green">Available</span></td>
+              </tr>
+              <tr>
+                <td><strong>Premium</strong></td>
+                <td>£49 / mo</td>
+                <td>Unlimited</td>
+                <td>All + NetSuite, API</td>
+                <td><span class="table-tag tag-blue">Most popular</span></td>
+              </tr>
+              <tr>
+                <td><strong>Enterprise</strong></td>
+                <td>Custom</td>
+                <td>Unlimited</td>
+                <td>All + custom</td>
+                <td><span class="table-tag tag-yellow">Contact sales</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <p class="demo-label">Comparison Table (Soldo vs traditional)</p>
+        <div class="table-wrap table-compare" role="region" aria-label="Soldo versus traditional expense management comparison">
+          <table>
+            <caption>How Soldo compares to traditional expense management</caption>
+            <thead>
+              <tr>
+                <th scope="col">Feature</th>
+                <th scope="col">Soldo</th>
+                <th scope="col">Traditional expense</th>
+                <th scope="col">Corporate credit card</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Real-time visibility</td>
+                <td><span class="check-yes" aria-label="Yes">✓</span></td>
+                <td><span class="check-no" aria-label="No">✗</span></td>
+                <td><span class="check-no" aria-label="No">✗</span></td>
+              </tr>
+              <tr>
+                <td>Automatic receipt matching</td>
+                <td><span class="check-yes" aria-label="Yes">✓</span></td>
+                <td><span class="check-no" aria-label="No">✗</span></td>
+                <td><span class="check-no" aria-label="No">✗</span></td>
+              </tr>
+              <tr>
+                <td>Per-card budget rules</td>
+                <td><span class="check-yes" aria-label="Yes">✓</span></td>
+                <td><span class="check-no" aria-label="No">✗</span></td>
+                <td><span class="check-no" aria-label="No">✗</span></td>
+              </tr>
+              <tr>
+                <td>Accounting auto-sync</td>
+                <td><span class="check-yes" aria-label="Yes">✓</span></td>
+                <td><span class="check-no" aria-label="No">✗</span></td>
+                <td><span class="check-no" aria-label="No">✗</span></td>
+              </tr>
+              <tr>
+                <td>No personal funds required</td>
+                <td><span class="check-yes" aria-label="Yes">✓</span></td>
+                <td><span class="check-no" aria-label="No">✗</span></td>
+                <td><span class="check-yes" aria-label="Yes">✓</span></td>
+              </tr>
+              <tr>
+                <td>Instant card issue</td>
+                <td><span class="check-yes" aria-label="Yes">✓</span></td>
+                <td>N/A</td>
+                <td><span class="check-no" aria-label="No">✗</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 7. CALLOUTS                                                -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-callouts">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">7</span>
+      <h2 id="section-callouts">Callout &amp; Alert Blocks</h2>
+    </div>
+    <p class="component-desc">Uses <code>role="note"</code> for informational, <code>role="alert"</code> for critical. Icons are decorative (<code>aria-hidden</code>); meaning is conveyed through text alone.</p>
+
+    <div class="component-group">
+
+      <div class="callout callout-info" role="note">
+        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M18 10A8 8 0 11 2 10a8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zm-1 9a1 1 0 01-1-1v-4a1 1 0 112 0v4a1 1 0 01-1 1z" clip-rule="evenodd"/></svg>
+        <div>
+          <strong>Did you know?</strong>
+          UK businesses spend an average of 6 hours per employee per month managing expense claims. Soldo reduces that to under 30 minutes.
+        </div>
+      </div>
+
+      <div class="callout callout-success" role="note">
+        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+        <div>
+          <strong>Best practice</strong>
+          Assign cards at the project level — not the employee level — for the clearest audit trail and the fastest VAT reclaim.
+        </div>
+      </div>
+
+      <div class="callout callout-warning" role="note">
+        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+        <div>
+          <strong>Watch out for this</strong>
+          If employees use personal cards for company expenses, you lose visibility, complicate VAT recovery, and create reconciliation headaches that cost more than the original transaction.
+        </div>
+      </div>
+
+      <div class="callout callout-tip" role="note">
+        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg>
+        <div>
+          <strong>Pro tip</strong>
+          Create a dedicated virtual card for each SaaS subscription. When a renewal appears, you can trace it instantly — no more mystery charges on the company card.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 8. STAT CARDS                                              -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-stats">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">8</span>
+      <h2 id="section-stats">Stat &amp; Highlight Cards</h2>
+    </div>
+    <p class="component-desc">For social proof and authority moments. <code>aria-label</code> on each card ensures screen readers get the full context, not just the number.</p>
+
+    <div class="stat-grid" role="list" aria-label="Soldo by the numbers">
+      <div class="stat-card" role="listitem" aria-label="Over 26,000 businesses use Soldo">
+        <div class="stat-number">26k+</div>
+        <div class="stat-label">Businesses on Soldo</div>
+        <div class="stat-sub">Across 31 countries</div>
+      </div>
+      <div class="stat-card" role="listitem" aria-label="Average 6 hours saved per month per team">
+        <div class="stat-number">6hrs</div>
+        <div class="stat-label">Saved per team / month</div>
+        <div class="stat-sub">On expense admin</div>
+      </div>
+      <div class="stat-card" role="listitem" aria-label="98 percent customer satisfaction score">
+        <div class="stat-number">98%</div>
+        <div class="stat-label">Customer satisfaction</div>
+        <div class="stat-sub">Trustpilot, 2024</div>
+      </div>
+      <div class="stat-card" role="listitem" aria-label="2 minutes average setup time">
+        <div class="stat-number">2min</div>
+        <div class="stat-label">Average setup</div>
+        <div class="stat-sub">Cards issued instantly</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 9. QUOTES & TESTIMONIALS                                   -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-quotes">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">9</span>
+      <h2 id="section-quotes">Quotes &amp; Testimonials</h2>
+    </div>
+    <p class="component-desc">Editorial blockquote for in-article authority moments. Testimonial card for social proof panels. Both use semantic <code>&lt;blockquote&gt;</code> and <code>&lt;cite&gt;</code>.</p>
+
+    <div class="component-group">
+
+      <div>
+        <p class="demo-label">Editorial Blockquote</p>
+        <figure>
+          <blockquote class="blockquote-editorial">
+            <p>"We closed our books three days faster after switching to Soldo. The reconciliation that used to take a full day is now automated overnight."</p>
+          </blockquote>
+          <figcaption>
+            <cite style="font-size:13px;color:var(--text-muted);font-style:normal;display:flex;align-items:center;gap:8px;padding-left:40px">
+              <span style="display:inline-block;width:24px;height:1px;background:var(--border-strong)"></span>
+              Sarah Chen, Head of Finance, TechCorp Ltd
+            </cite>
+          </figcaption>
+        </figure>
+      </div>
+
+      <div>
+        <p class="demo-label">Testimonial Card</p>
+        <figure>
+          <div class="testimonial-card">
+            <div class="quote-mark" aria-hidden="true">"</div>
+            <blockquote>
+              <p>Soldo transformed how we manage team budgets. Our finance manager has real-time visibility without having to chase anyone for receipts. Month-end is no longer something we dread.</p>
+            </blockquote>
+            <figcaption class="attribution">
+              <div class="attribution-avatar" aria-hidden="true">JM</div>
+              <div class="attribution-info">
+                <strong>James Mallory</strong>
+                <span>CFO, Brightfield Group</span>
+              </div>
+            </figcaption>
+          </div>
+        </figure>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 10. TABLE OF CONTENTS                                      -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-toc">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">10</span>
+      <h2 id="section-toc">Table of Contents</h2>
+    </div>
+    <p class="component-desc">Landmark nav for pillar page wayfinding. <code>&lt;nav aria-label="Page contents"&gt;</code> wraps the TOC so screen reader users can jump to it quickly.</p>
+
+    <nav aria-label="Page contents" class="toc">
+      <div class="toc-header">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M2 4h12v1H2V4zm0 3.5h12v1H2v-1zM2 11h8v1H2v-1z" clip-rule="evenodd"/></svg>
+        In this guide
+      </div>
+      <ol>
+        <li><a href="#">What is spend management?</a></li>
+        <li><a href="#">Why traditional expense processes fail</a></li>
+        <li><a href="#">How Soldo works</a></li>
+        <li><a href="#">Key features explained</a></li>
+        <li><a href="#">Integrations and accounting sync</a></li>
+        <li><a href="#">Pricing and plans</a></li>
+        <li><a href="#">Getting started: step-by-step</a></li>
+        <li><a href="#">Frequently asked questions</a></li>
+      </ol>
+    </nav>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 11. FEATURE CARDS                                          -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-features">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">11</span>
+      <h2 id="section-features">Feature Cards</h2>
+    </div>
+    <p class="component-desc">Auto-fit grid adapts from 4 columns to 2 to 1 based on viewport. Each card is a passive content block (not interactive), so no ARIA role needed beyond the default.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="18" height="14" rx="2"/><path d="M16 2v6M6 2v6M2 9h18"/></svg>
+        </div>
+        <h4>Real-time dashboard</h4>
+        <p>See every transaction the moment it happens. Filter by team, project, merchant, or date.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <h4>Smart spend rules</h4>
+        <p>Define what can be spent, where, and by whom. Rules enforce themselves — no approvals needed.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9S3 16.97 3 12 7.03 3 12 3s9 4.03 9 9z"/></svg>
+        </div>
+        <h4>Automated reconciliation</h4>
+        <p>Receipts match to transactions automatically. VAT codes applied from merchant data.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="12" height="18" rx="2"/><path d="M9 7h4M9 11h4M9 15h2"/></svg>
+        </div>
+        <h4>Instant card issue</h4>
+        <p>Physical and virtual Mastercards available immediately after account setup. No waiting.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 12. PROSE / RICH TEXT                                      -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-prose">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">12</span>
+      <h2 id="section-prose">Prose &amp; Rich Text</h2>
+    </div>
+    <p class="component-desc">Body copy spec: 17px / 1.75 line-height / Open Sans 200. This exceeds WCAG 1.4.8 (1.5 line spacing) and WCAG 1.4.12 (text spacing). Max-width 680px for optimal reading line length (~70 chars).</p>
+
+    <article class="prose" aria-label="Sample prose content">
+      <h2>Why spend management matters more than ever</h2>
+      <p>Business spending is no longer confined to a single company credit card or a carefully managed petty cash tin. Today, teams buy SaaS tools, book travel, purchase supplies, and entertain clients — often across dozens of different payment methods and currencies.</p>
+      <p>The result? Finance teams are perpetually catching up. Month-end reconciliation becomes a detective exercise, and the finance director's dashboard shows <strong>historical data</strong>, not what's happening right now.</p>
+      <h3>The cost of poor spend visibility</h3>
+      <p>When businesses lack real-time spend visibility, the consequences compound. A <a href="#">2024 study by Barclaycard</a> found that 62% of UK finance managers discovered unexpected expenditure at month-end that they had no prior knowledge of. Each incident costs an average of <code>£1,200</code> in finance team time to investigate and resolve.</p>
+    </article>
+  </section>
+
+
+  <!-- ========================================================= -->
+  <!-- ── CONTENT LAYOUT BLOCKS ─────────────────────────────── -->
+  <!-- ========================================================= -->
+
+  <!-- Section group header -->
+  <div style="text-align:center;padding:var(--space-2xl) 0 var(--space-xl);border-top:2px solid var(--border);margin-top:var(--space-2xl);">
+    <div class="library-badge" style="margin-bottom:var(--space-md)" aria-hidden="true">
+      <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M2 3h12v2H2V3zm0 4h8v2H2V7zm0 4h10v2H2v-2z"/></svg>
+      Content Layout Blocks
+    </div>
+    <h2 style="font-family:var(--font-display);font-size:clamp(1.5rem,3vw,2.25rem);font-weight:400;color:var(--text-primary);margin-bottom:var(--space-sm)">Layout patterns for content-heavy pages</h2>
+    <p style="color:var(--text-secondary);font-size:15px;max-width:520px;margin:0 auto">Passive content blocks — no interactive behaviour. All images are placeholders ready for real assets. Mix contained and full-bleed treatments to create rhythm and pacing.</p>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- 13. TEXT + IMAGE — 50/50                                   -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-split50">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">13</span>
+      <h2 id="section-split50">Text + Image — 50/50 Split</h2>
+    </div>
+    <p class="component-desc">Image left and image right variants. Responsive: stacks to single column below 700px. Decorative media badge overlaid on image for data callouts.</p>
+
+    <div class="component-group">
+
+      <div>
+        <p class="demo-label">Image left</p>
+        <div class="split-50">
+          <div class="split-media" role="img" aria-label="Screenshot of Soldo real-time dashboard showing live transactions">
+            <div class="media-placeholder" aria-hidden="true">
+              <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="6" width="32" height="24" rx="3"/><path d="M4 14h32M14 14v16"/></svg>
+              <span>Dashboard screenshot</span>
+            </div>
+            <div class="media-badge" aria-label="Live sync indicator">
+              <span class="badge-dot" aria-hidden="true"></span>
+              Syncing live
+            </div>
+          </div>
+          <div class="split-text">
+            <span class="eyebrow">Real-time visibility</span>
+            <h3>See every transaction the moment it happens</h3>
+            <p>Finance teams no longer need to wait until month-end to understand where money is going. Soldo's live dashboard surfaces every card transaction the instant it's made — categorised, tagged, and matched to a receipt.</p>
+            <p>Filter by team, cost centre, merchant type, or date range. Export to your accounting software in a single click.</p>
+            <a href="#" class="split-link">
+              Explore the dashboard
+              <svg viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><path d="M7 1l6 6-6 6M1 7h12"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="layout-divider" aria-hidden="true">Image right</div>
+
+      <div>
+        <p class="demo-label">Image right</p>
+        <div class="split-50 reverse">
+          <div class="split-media" role="img" aria-label="Screenshot of Soldo mobile app receipt capture">
+            <div class="media-placeholder" aria-hidden="true">
+              <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="11" y="2" width="18" height="36" rx="4"/><path d="M16 32h8"/></svg>
+              <span>Mobile app screenshot</span>
+            </div>
+          </div>
+          <div class="split-text">
+            <span class="eyebrow">Receipt capture</span>
+            <h3>Receipts captured at the point of purchase</h3>
+            <p>When an employee pays with their Soldo card, the app prompts them to snap a receipt immediately. No more chasing paperwork at month-end — the audit trail builds itself.</p>
+            <a href="#" class="split-link">
+              See how it works
+              <svg viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><path d="M7 1l6 6-6 6M1 7h12"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 14. TEXT + IMAGE — 60/40                                   -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-split60">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">14</span>
+      <h2 id="section-split60">Text + Image — 60/40 Split</h2>
+    </div>
+    <p class="component-desc">Wider text column for copy-heavy sections where the image is supporting rather than leading. Portrait media aspect (3/4) works well for UI mockups and phone screens.</p>
+
+    <div class="component-group">
+
+      <div>
+        <p class="demo-label">Text left (60), image right (40)</p>
+        <div class="split-60">
+          <div class="split-text">
+            <span class="eyebrow">Accounting integrations</span>
+            <h3>Your books update themselves</h3>
+            <p>Soldo connects natively with Xero, QuickBooks, Sage, and NetSuite. Every transaction — with its receipt, VAT code, and category — flows directly into your accounting software the moment it's made.</p>
+            <p>Account mappings are configured once and applied automatically. Your chart of accounts, your rules, your way. No rekeying, no imports, no reconciliation ritual at month-end.</p>
+            <ul class="list-check" style="margin-top:var(--space-md)">
+              <li>Xero, QuickBooks, Sage, NetSuite — native connectors</li>
+              <li>Custom account code mapping per merchant category</li>
+              <li>Automatic VAT rate detection</li>
+            </ul>
+          </div>
+          <div class="split-media" role="img" aria-label="Accounting software integration interface showing sync status">
+            <div class="media-placeholder" aria-hidden="true">
+              <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="20" cy="20" r="16"/><path d="M12 20h16M20 12v16"/></svg>
+              <span>Integration UI</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <p class="demo-label">Image left (40), text right (60)</p>
+        <div class="split-60 reverse">
+          <div class="split-text">
+            <span class="eyebrow">Card controls</span>
+            <h3>Set the rules once. Let the cards enforce them.</h3>
+            <p>Define exactly what each card can be used for — which merchant categories are permitted, what the monthly limit is, whether online transactions are allowed. When a transaction falls outside those rules, the card declines automatically.</p>
+            <p>No manual review process. No exceptions that slip through. Finance sets the policy; Soldo enforces it in real time.</p>
+          </div>
+          <div class="split-media" role="img" aria-label="Card control settings panel showing spend rules configuration">
+            <div class="media-placeholder" aria-hidden="true">
+              <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="10" width="28" height="20" rx="3"/><path d="M6 16h28M14 22h4M22 22h8"/></svg>
+              <span>Card controls UI</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 15. EDITORIAL / CHAPTER INTRO — full-bleed                 -->
+  <!-- ========================================================= -->
+  <section aria-labelledby="section-editorial" style="margin-bottom:var(--space-2xl)">
+    <div style="padding:0 var(--space-lg);margin-bottom:var(--space-lg)">
+      <div class="section-label">
+        <span class="section-num" aria-hidden="true">15</span>
+        <h2 id="section-editorial">Editorial / Chapter Intro Block</h2>
+      </div>
+      <p class="component-desc">Full-bleed treatment for chapter breaks, guide introductions, or section transitions. Dark and light variants. Summary meta row surfaces key facts at a glance.</p>
+    </div>
+
+    <div class="component-group" style="padding:0 var(--space-lg)">
+
+      <div>
+        <p class="demo-label">Dark variant</p>
+        <div class="editorial-intro full-bleed" role="region" aria-label="Chapter introduction: The true cost of manual expense management">
+          <div class="editorial-intro-inner">
+            <span class="chapter-label">Chapter 2</span>
+            <h2>The true cost of manual expense management</h2>
+            <p class="intro-lead">Most finance teams don't realise how much time and money they spend managing expenses the manual way — until they see it in a spreadsheet. This chapter breaks down the real cost, by the numbers.</p>
+            <div class="intro-meta" role="list" aria-label="Key statistics">
+              <div class="intro-meta-item" role="listitem">
+                <span class="meta-value">6hrs</span>
+                <span class="meta-label">Lost per employee / month</span>
+              </div>
+              <div class="intro-meta-item" role="listitem">
+                <span class="meta-value">£1,200</span>
+                <span class="meta-label">Avg. cost per unplanned transaction</span>
+              </div>
+              <div class="intro-meta-item" role="listitem">
+                <span class="meta-value">19%</span>
+                <span class="meta-label">Of expense claims contain errors</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <p class="demo-label">Light variant</p>
+        <div class="editorial-intro editorial-light full-bleed" role="region" aria-label="Chapter introduction: How modern spend management works">
+          <div class="editorial-intro-inner">
+            <span class="chapter-label">Chapter 3</span>
+            <h2>How modern spend management works</h2>
+            <p class="intro-lead">Replacing manual processes with a platform like Soldo isn't just about saving time — it fundamentally changes how finance teams relate to the rest of the business. Here's what that shift looks like in practice.</p>
+            <div class="intro-meta" role="list" aria-label="Key facts">
+              <div class="intro-meta-item" role="listitem">
+                <span class="meta-value">Real-time</span>
+                <span class="meta-label">Transaction data</span>
+              </div>
+              <div class="intro-meta-item" role="listitem">
+                <span class="meta-value">Zero</span>
+                <span class="meta-label">Manual reconciliation</span>
+              </div>
+              <div class="intro-meta-item" role="listitem">
+                <span class="meta-value">1-click</span>
+                <span class="meta-label">Accounting sync</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 16. COLUMN LAYOUTS — 2-col & 3-col                         -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-cols">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">16</span>
+      <h2 id="section-cols">Column Layouts — 2-col &amp; 3-col</h2>
+    </div>
+    <p class="component-desc">Three structural variants: open grid, ruled (vertical dividers, contained border), and shaded alternate. All collapse to single column on mobile, 3-col to 2-col at medium breakpoint.</p>
+
+    <div class="component-group">
+
+      <div>
+        <p class="demo-label">2-column — open</p>
+        <div class="col-layout col-2">
+          <div class="col-item">
+            <h3 class="col-heading">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" style="color:var(--accent-text)"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 2a5 5 0 110 10A5 5 0 018 3zm-.75 2.5v3.25l2.5 1.5-.75 1.25-3-1.75V5.5h1.25z"/></svg>
+              Before Soldo
+            </h3>
+            <p>Finance teams manually collect receipts, re-enter data into spreadsheets, and chase employees for missing documentation — typically spending the last week of every month on reconciliation alone.</p>
+          </div>
+          <div class="col-item">
+            <h3 class="col-heading">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" style="color:var(--success)"><path fill-rule="evenodd" d="M8 1a7 7 0 100 14A7 7 0 008 1zm3.78 5.78a.75.75 0 00-1.06-1.06L7 9.44 5.28 7.72a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25z" clip-rule="evenodd"/></svg>
+              After Soldo
+            </h3>
+            <p>Transactions are captured, categorised, and synced to accounting software automatically. Month-end closes in hours, not days. Finance teams refocus on strategic analysis instead of administrative chasing.</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <p class="demo-label">3-column — ruled (contained border + vertical dividers)</p>
+        <div class="col-layout col-3 col-ruled">
+          <div class="col-item">
+            <h3 class="col-heading">Visibility</h3>
+            <p>See every transaction in real time, across every card, team, and project. No more end-of-month surprises.</p>
+          </div>
+          <div class="col-item">
+            <h3 class="col-heading">Control</h3>
+            <p>Set spend rules, limits, and merchant restrictions per card. Policy enforced automatically — no manual review needed.</p>
+          </div>
+          <div class="col-item">
+            <h3 class="col-heading">Efficiency</h3>
+            <p>Receipts matched, VAT coded, and synced to your accounting software without a single manual entry.</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <p class="demo-label">3-column — open grid with leading eyebrow</p>
+        <div class="col-layout col-3">
+          <div class="col-item">
+            <p style="font-size:2rem;font-family:var(--font-display);color:var(--accent-text);line-height:1;margin-bottom:var(--space-sm)">01</p>
+            <h3 class="col-heading" style="border-color:var(--accent)">Define your rules</h3>
+            <p>Set per-card limits, merchant category restrictions, and approval thresholds. Configure once; apply instantly across every card in your account.</p>
+          </div>
+          <div class="col-item">
+            <p style="font-size:2rem;font-family:var(--font-display);color:var(--accent-text);line-height:1;margin-bottom:var(--space-sm)">02</p>
+            <h3 class="col-heading" style="border-color:var(--accent)">Issue cards instantly</h3>
+            <p>Create physical or virtual Mastercards for any team member in seconds. No branch visit. No waiting. Cards are active immediately.</p>
+          </div>
+          <div class="col-item">
+            <p style="font-size:2rem;font-family:var(--font-display);color:var(--accent-text);line-height:1;margin-bottom:var(--space-sm)">03</p>
+            <h3 class="col-heading" style="border-color:var(--accent)">Close the books faster</h3>
+            <p>Every transaction flows into Xero, QuickBooks, or Sage automatically. Month-end reconciliation becomes a confirmation, not an investigation.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 17. PULL QUOTE / BIG NUMBER BREAKOUT                       -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-pq">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">17</span>
+      <h2 id="section-pq">Pull Quote &amp; Big Number Breakout</h2>
+    </div>
+    <p class="component-desc">Three pull quote variants (contained, accent, dark) for in-article authority moments. Big number row for statistical proof points — uses CSS grid gap-lines to avoid table semantics on a purely decorative layout.</p>
+
+    <div class="component-group">
+
+      <div>
+        <p class="demo-label">Pull quote — contained</p>
+        <figure>
+          <div class="pull-quote-block pq-contained">
+            <span class="pq-quotemark" aria-hidden="true">"</span>
+            <blockquote class="pq-text">
+              We used to spend more time managing the evidence of spending than actually managing the spending itself.
+            </blockquote>
+            <figcaption class="pq-cite">— Emma Hartley, Finance Director, Meridian Group</figcaption>
+          </div>
+        </figure>
+      </div>
+
+      <div>
+        <p class="demo-label">Pull quote — dark (full-bleed)</p>
+        <figure>
+          <div class="pull-quote-block pq-dark full-bleed">
+            <span class="pq-quotemark" aria-hidden="true">"</span>
+            <blockquote class="pq-text">
+              Soldo didn't just save us time — it gave our finance team back their credibility. They went from reactive to strategic overnight.
+            </blockquote>
+            <figcaption class="pq-cite">— James Okafor, CFO, Nexus Digital</figcaption>
+          </div>
+        </figure>
+      </div>
+
+      <div>
+        <p class="demo-label">Big number row — bordered grid</p>
+        <div class="big-number-row" role="list" aria-label="Impact statistics">
+          <div class="big-number-item" role="listitem">
+            <div class="bn-value">72%</div>
+            <div class="bn-label">Reduction in time spent on expense admin</div>
+            <div class="bn-source">Soldo customer survey, 2024</div>
+          </div>
+          <div class="big-number-item" role="listitem">
+            <div class="bn-value">3 days</div>
+            <div class="bn-label">Average month-end close time saved</div>
+            <div class="bn-source">Internal benchmarking</div>
+          </div>
+          <div class="big-number-item" role="listitem">
+            <div class="bn-value">£0</div>
+            <div class="bn-label">Unexpected charges after policy enforcement</div>
+            <div class="bn-source">Post-implementation average</div>
+          </div>
+          <div class="big-number-item" role="listitem">
+            <div class="bn-value">26k+</div>
+            <div class="bn-label">Businesses managing spend on Soldo</div>
+            <div class="bn-source">Active accounts, Q1 2025</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 18. TIMELINE — horizontal & vertical                       -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-timeline">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">18</span>
+      <h2 id="section-timeline">Timeline &amp; Process Flow</h2>
+    </div>
+    <p class="component-desc">Vertical timeline for step-by-step narratives (past/present/future state). Horizontal timeline for parallel process stages. Both use CSS pseudo-elements for the connecting line — no SVG required.</p>
+
+    <div class="component-group">
+
+      <div>
+        <p class="demo-label">Vertical timeline — history / milestones</p>
+        <ol class="timeline-vertical" aria-label="Soldo product milestones">
+          <li class="timeline-item tl-complete">
+            <div class="tl-date">2015</div>
+            <div class="tl-title">Founded in London</div>
+            <div class="tl-body">Soldo launched with a simple mission: give finance teams real-time control over company spending without the friction of traditional corporate cards.</div>
+          </li>
+          <li class="timeline-item tl-complete">
+            <div class="tl-date">2018</div>
+            <div class="tl-title">First accounting integrations</div>
+            <div class="tl-body">Native Xero and QuickBooks connectors introduced — the first direct expense-to-accounting sync on the market.</div>
+          </li>
+          <li class="timeline-item tl-complete">
+            <div class="tl-date">2021</div>
+            <div class="tl-title">Expansion across Europe</div>
+            <div class="tl-body">Platform launched in Italy, Ireland, France, Spain, and Germany. 10,000 businesses on the platform by year end.</div>
+          </li>
+          <li class="timeline-item">
+            <div class="tl-date">2024</div>
+            <div class="tl-title">AI-powered categorisation</div>
+            <div class="tl-body">Intelligent transaction tagging introduced, reducing manual category assignment by 94% for most customers.</div>
+          </li>
+          <li class="timeline-item tl-future">
+            <div class="tl-date">Coming next</div>
+            <div class="tl-title">Predictive spend forecasting</div>
+            <div class="tl-body">Budget variance alerts and AI-driven spend forecasting — giving finance teams a forward view, not just a rear-view mirror.</div>
+          </li>
+        </ol>
+      </div>
+
+      <div>
+        <p class="demo-label">Horizontal timeline — process stages</p>
+        <ol class="timeline-horizontal" aria-label="Soldo onboarding process">
+          <li class="timeline-h-item">
+            <div class="tl-step">Step 1</div>
+            <div class="tl-title">Create account</div>
+            <div class="tl-body">Register your business and complete ID verification in under 3 minutes.</div>
+          </li>
+          <li class="timeline-h-item">
+            <div class="tl-step">Step 2</div>
+            <div class="tl-title">Add your team</div>
+            <div class="tl-body">Invite employees and assign cards with individual spending rules.</div>
+          </li>
+          <li class="timeline-h-item">
+            <div class="tl-step">Step 3</div>
+            <div class="tl-title">Connect accounting</div>
+            <div class="tl-body">Link Xero, QuickBooks, or Sage with one click.</div>
+          </li>
+          <li class="timeline-h-item">
+            <div class="tl-step">Step 4</div>
+            <div class="tl-title">Go live</div>
+            <div class="tl-body">Cards are active immediately. Transactions flow in real time from day one.</div>
+          </li>
+        </ol>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 19. BEFORE / AFTER SPLIT PANEL                             -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-ba">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">19</span>
+      <h2 id="section-ba">Before / After Split Panel</h2>
+    </div>
+    <p class="component-desc">Side-by-side contrast layout. Uses semantic lists with distinct visual markers — dashes for the "before" state, checkmarks for "after". Responsive: stacks vertically on mobile with before above after.</p>
+
+    <div class="component-group">
+
+      <div>
+        <p class="demo-label">Standard before / after</p>
+        <div class="before-after">
+          <div class="ba-panel ba-before">
+            <div class="ba-label">Before Soldo</div>
+            <h3 class="ba-heading">The way most businesses still manage expenses</h3>
+            <ul class="ba-list" aria-label="Problems with traditional expense management">
+              <li>Employees pay out of pocket and wait weeks for reimbursement</li>
+              <li>Receipts collected in envelopes and submitted at month-end</li>
+              <li>Finance manually re-enters data from paper receipts</li>
+              <li>No visibility into what's been spent until the statement arrives</li>
+              <li>Month-end close takes 5–7 working days</li>
+              <li>Budget overruns discovered after the fact</li>
+              <li>VAT reclaim delayed by missing documentation</li>
+            </ul>
+          </div>
+          <div class="ba-panel ba-after">
+            <div class="ba-label">With Soldo</div>
+            <h3 class="ba-heading">How finance teams operate when they have real control</h3>
+            <ul class="ba-list" aria-label="Benefits of Soldo spend management">
+              <li>Employees spend on company cards — no out-of-pocket costs</li>
+              <li>Receipts captured instantly at point of purchase via the app</li>
+              <li>Transactions auto-synced to accounting software in real time</li>
+              <li>Live dashboard shows every transaction as it happens</li>
+              <li>Month-end close in hours, not days</li>
+              <li>Budgets enforced automatically — overspend is impossible</li>
+              <li>VAT coded automatically from merchant data</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <p class="demo-label">Compact variant — process comparison</p>
+        <div class="before-after">
+          <div class="ba-panel ba-before">
+            <div class="ba-label">Manual process</div>
+            <h3 class="ba-heading">Typical month-end close — 5 days</h3>
+            <ul class="ba-list" aria-label="Manual process steps">
+              <li>Day 1: Chase employees for missing receipts</li>
+              <li>Day 2–3: Data entry and category coding</li>
+              <li>Day 4: Review and correct errors</li>
+              <li>Day 5: Upload to accounting software, fix import errors</li>
+            </ul>
+          </div>
+          <div class="ba-panel ba-after">
+            <div class="ba-label">With Soldo</div>
+            <h3 class="ba-heading">Automated month-end close — same day</h3>
+            <ul class="ba-list" aria-label="Soldo process steps">
+              <li>All receipts already matched and attached</li>
+              <li>Categories and VAT codes applied automatically</li>
+              <li>Data already in accounting software — no upload needed</li>
+              <li>Review dashboard, approve, close. Done.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 20. IMAGE GRID — 2-up, 3-up, mosaic                        -->
+  <!-- ========================================================= -->
+  <section class="component-section" aria-labelledby="section-imgrid">
+    <div class="section-label">
+      <span class="section-num" aria-hidden="true">20</span>
+      <h2 id="section-imgrid">Image Grid — 2-up, 3-up, Mosaic</h2>
+    </div>
+    <p class="component-desc">Three grid layouts for visual content. All cells use <code>role="img"</code> with descriptive <code>aria-label</code>. Mosaic uses CSS grid span to create a featured-image-plus-thumbnails layout. Replace placeholder divs with <code>&lt;img&gt;</code> tags in production.</p>
+
+    <div class="component-group">
+
+      <div>
+        <p class="demo-label">2-up grid</p>
+        <figure>
+          <div class="img-grid img-grid-2up">
+            <div class="img-cell" role="img" aria-label="Finance team reviewing Soldo dashboard in office">
+              <div class="cell-inner" aria-hidden="true">
+                <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="24" height="18" rx="3"/><path d="M8 10h12M8 14h8"/></svg>
+                <span>Dashboard in office</span>
+              </div>
+            </div>
+            <div class="img-cell" role="img" aria-label="Employee using Soldo mobile app to capture receipt">
+              <div class="cell-inner" aria-hidden="true">
+                <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2" width="12" height="24" rx="3"/><path d="M11 21h6"/></svg>
+                <span>Mobile receipt capture</span>
+              </div>
+            </div>
+          </div>
+          <figcaption class="img-grid-caption">Soldo works across desktop and mobile — wherever your team is spending.</figcaption>
+        </figure>
+      </div>
+
+      <div>
+        <p class="demo-label">3-up grid</p>
+        <figure>
+          <div class="img-grid img-grid-3up">
+            <div class="img-cell" role="img" aria-label="Virtual card creation flow in Soldo dashboard">
+              <div class="cell-inner" aria-hidden="true">
+                <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="22" height="14" rx="2"/><path d="M3 12h22M8 17h4"/></svg>
+                <span>Virtual card creation</span>
+              </div>
+            </div>
+            <div class="img-cell" role="img" aria-label="Team budget overview showing spend by department">
+              <div class="cell-inner" aria-hidden="true">
+                <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 20V12l6-4 6 4 8-6v14"/><path d="M4 20h20"/></svg>
+                <span>Budget by department</span>
+              </div>
+            </div>
+            <div class="img-cell" role="img" aria-label="Accounting sync confirmation screen showing successful Xero connection">
+              <div class="cell-inner" aria-hidden="true">
+                <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 14l5 5 11-11"/><circle cx="14" cy="14" r="11"/></svg>
+                <span>Accounting sync</span>
+              </div>
+            </div>
+          </div>
+          <figcaption class="img-grid-caption">From card issue to reconciliation — every step of the spend journey in one platform.</figcaption>
+        </figure>
+      </div>
+
+      <div>
+        <p class="demo-label">Mosaic grid — featured + 2 thumbnails</p>
+        <figure>
+          <div class="img-grid img-grid-mosaic">
+            <div class="img-cell" role="img" aria-label="Finance manager reviewing live spending dashboard with full team view">
+              <div class="cell-inner" aria-hidden="true">
+                <svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="5" width="30" height="22" rx="3"/><path d="M3 13h30M11 13v14"/><path d="M16 18h10M16 22h6"/></svg>
+                <span>Featured: full dashboard view</span>
+              </div>
+            </div>
+            <div class="img-cell" role="img" aria-label="Physical Soldo Mastercard held in hand">
+              <div class="cell-inner" aria-hidden="true">
+                <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="22" height="14" rx="2"/><circle cx="10" cy="14" r="3" opacity=".5"/><circle cx="16" cy="14" r="3"/></svg>
+                <span>Physical card</span>
+              </div>
+            </div>
+            <div class="img-cell" role="img" aria-label="Push notification on phone showing transaction alert">
+              <div class="cell-inner" aria-hidden="true">
+                <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 3a7 7 0 00-7 7v5l-2 2h18l-2-2V10a7 7 0 00-7-7z"/><path d="M11 21a3 3 0 006 0"/></svg>
+                <span>Transaction alert</span>
+              </div>
+            </div>
+          </div>
+          <figcaption class="img-grid-caption">Real-time alerts keep everyone informed — from the finance team to the individual cardholder.</figcaption>
+        </figure>
+      </div>
+
+    </div>
+  </section>
+
+</div><!-- /page-wrap -->
+
+
+<script>
+/* =========================================================
+   ACCORDION — single-open per group, full keyboard support
+   WCAG: 4.1.2 Name/Role/Value, 2.1.1 Keyboard
+========================================================= */
+document.querySelectorAll('[data-accordion]').forEach(accordion => {
+  const triggers = accordion.querySelectorAll('.accordion-trigger');
+
+  triggers.forEach(trigger => {
+    trigger.addEventListener('click', () => {
+      const isSingle = accordion.dataset.accordion === 'single';
+      const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
+      const panelId = trigger.getAttribute('aria-controls');
+      const panel = document.getElementById(panelId);
+
+      if (isSingle && !isExpanded) {
+        // Close all others
+        triggers.forEach(t => {
+          t.setAttribute('aria-expanded', 'false');
+          const p = document.getElementById(t.getAttribute('aria-controls'));
+          if (p) p.dataset.open = 'false';
+        });
+      }
+
+      const next = !isExpanded;
+      trigger.setAttribute('aria-expanded', String(next));
+      if (panel) panel.dataset.open = String(next);
+    });
+  });
+});
+
+/* =========================================================
+   TABS — horizontal and vertical
+   WCAG: Arrow key navigation, Home/End, roving tabindex
+========================================================= */
+function initTabs(container) {
+  const tablist = container.querySelector('[role="tablist"]');
+  if (!tablist) return;
+  const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+  const isVertical = tablist.getAttribute('aria-orientation') === 'vertical';
+
+  function activate(tab) {
+    tabs.forEach(t => {
+      t.setAttribute('aria-selected', 'false');
+      t.setAttribute('tabindex', '-1');
+    });
+    tab.setAttribute('aria-selected', 'true');
+    tab.setAttribute('tabindex', '0');
+    tab.focus();
+
+    // Hide all panels
+    const allPanels = container.querySelectorAll('[role="tabpanel"]');
+    allPanels.forEach(p => {
+      p.classList.remove('is-active');
+      p.hidden = true;
+    });
+
+    // Show active panel
+    const panel = document.getElementById(tab.getAttribute('aria-controls'));
+    if (panel) {
+      panel.classList.add('is-active');
+      panel.hidden = false;
+    }
+  }
+
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => activate(tab));
+
+    tab.addEventListener('keydown', e => {
+      const prev = isVertical ? 'ArrowUp' : 'ArrowLeft';
+      const next = isVertical ? 'ArrowDown' : 'ArrowRight';
+
+      if (e.key === next) {
+        e.preventDefault();
+        activate(tabs[(index + 1) % tabs.length]);
+      } else if (e.key === prev) {
+        e.preventDefault();
+        activate(tabs[(index - 1 + tabs.length) % tabs.length]);
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        activate(tabs[0]);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        activate(tabs[tabs.length - 1]);
+      }
+    });
+  });
+}
+
+document.querySelectorAll('.tabs-horizontal, .tabs-vertical').forEach(initTabs);
+</script>
+
+</body>
+</html>
